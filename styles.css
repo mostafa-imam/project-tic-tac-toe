@@ -155,7 +155,6 @@ body {
 
 .solo-multiplayer {
     margin-top: 20vh;
-    /* display: none; */
 }
 
 .play-mode-button {
@@ -165,6 +164,7 @@ body {
     background-color: var(--clr-2);
     border: 1px solid black;
     box-shadow:  5px 5px 2px black;
+    color: black;
 }
 
 .play-mode-button:hover {
@@ -185,7 +185,6 @@ body {
 }
 
 main {
-    /* display: grid; */
     display: none;
     grid-template-columns: repeat(12, 1fr);
 }
@@ -263,7 +262,15 @@ main > * {
     box-shadow:  5px 5px 2px black;
 }
 
-.board-item:hover {
+.ex {
+    background-image: url(./assets/ex.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.oh {
+    background-image: url(./assets/oh.svg);
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -321,6 +328,7 @@ main > * {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    margin-bottom: var(--fs-1);
 }
 
 .player-one-two-wrapper > input {
@@ -328,10 +336,6 @@ main > * {
     border: 1px solid #c9c9c9;
     height: var(--fs-4);
     padding-left: var(--fs-1);
-}
-
-form .player-one-wrapper {
-    margin-bottom: var(--fs-1);
 }
 
 label[for=player-one-name],
@@ -402,7 +406,7 @@ label[for="oh-select"] {
     }
 
     .play-mode-button {
-        width: 60%;
+        width: 100%;
         height: var(--fs-4);
         border-radius: 5px;
         background-color: var(--clr-2);
@@ -411,11 +415,7 @@ label[for="oh-select"] {
     }
 
     .solo-multiplayer {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        /* display: none; */
+        grid-column: 3/-3;
     }
 }
 
