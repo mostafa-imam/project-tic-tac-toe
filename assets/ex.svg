@@ -26,7 +26,7 @@
      inkscape:zoom="34.291667"
      inkscape:cx="12"
      inkscape:cy="12"
-     inkscape:window-width="957"
+     inkscape:window-width="1025"
      inkscape:window-height="1032"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -35,5 +35,5 @@
   <path
      d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
      id="path1"
-     style="fill:#000000" />
+     style="fill:#07a9f5;fill-opacity:1" />
 </svg>
