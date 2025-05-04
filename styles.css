@@ -241,6 +241,26 @@ main > * {
     min-width: max-content;
 }
 
+.ex-active-player {
+    background-color: var(--clr-5);
+}
+
+.oh-active-player {
+    background-color: var(--clr-8);
+}
+
+.draws-active {
+    background-color: var(--clr-10);
+}
+
+.winner-ex {
+    background-color: var(--clr-6);
+}
+
+.winner-oh {
+    background-color: var(--clr-9);
+}
+
 .board-wrapper {
     display: grid;
     grid-template-columns: repeat(3, 100px);
