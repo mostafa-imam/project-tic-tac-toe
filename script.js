@@ -213,6 +213,10 @@ const gameController = (function() {
     const exSelect = document.querySelector('.ex-select');
     const ohSelect = document.querySelector('.oh-select');
     const markSelect = document.querySelector('.mark-select');
+
+    const playerOneWrapper = document.querySelector('.player-one-wrapper.subscore-wrapper');
+    const playerTwoWrapper = document.querySelector('.player-two-wrapper.subscore-wrapper');
+    const drawsWrapper = document.querySelector('.draws-wrapper.subscore-wrapper');
     
     const saveButton = document.querySelector("button[type='button']")
     const soloButton = document.querySelector('.solo-button');
@@ -380,6 +384,7 @@ const gameController = (function() {
         gameController.resetActivePlayer();
         gameController.resetDrawsDeclared();
         updateScreen();
+        addSomeColor();
 
         if (gameController.getPlaySolo() && gameController.getActivePlayer().name === "Computer") {
             makeComputerMove();
@@ -389,6 +394,7 @@ const gameController = (function() {
     function refreshUI() {
         updateScreen();
         updateScores();
+        addSomeColor();
     }
 
     function makeComputerMove(delay = 500) {
@@ -404,5 +410,26 @@ const gameController = (function() {
         }, delay);
     }
 
+    function addSomeColor(time = 500) {
+        if (gameController.getActivePlayer().mark === 'x') {
+            playerOneWrapper.classList.add("ex-active-player");
+            playerTwoWrapper.classList.remove("oh-active-player");
+        } else if (gameController.getActivePlayer().mark === 'o') {
+            playerTwoWrapper.classList.add("oh-active-player");
+            playerOneWrapper.classList.remove("ex-active-player");
+        };
+        
+        if (gameController.getDraws(time = 5000)) {
+            drawsWrapper.classList.add('draws-active');
+            playerOneWrapper.classList.remove("ex-active-player");
+            playerTwoWrapper.classList.remove("oh-active-player");
+            setTimeout( ()=> {
+                drawsWrapper.classList.toggle('draws-active');
+            }, time);
+        }
+    }
+
+    addSomeColor();
     updateScreen();
+
 })();
