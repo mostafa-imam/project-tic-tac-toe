@@ -13,28 +13,6 @@ const gameboard = (function() {
                 mark: ''});
         }
     }
-
-    function addMark(pos, player) {
-        for (let row of board) {
-            row.forEach(cell => {
-                if (cell.cellNum === pos) {
-                    cell.name = player.name;
-                    cell.mark = player.mark;
-                }
-            });
-        }
-    }
-    
-    function checkInvalidMove(pos) {
-        for (let row of board) {
-            for (let cell of row) {
-                if (cell.cellNum === pos && cell.mark) {
-                    console.log('invalid move');
-                    return true;
-                }
-            }
-        }
-    }
     
     function clearBoard() {
         for (let row of board) {
@@ -49,8 +27,6 @@ const gameboard = (function() {
     const getBoard = () => board;
 
     return {
-        addMark,
-        checkInvalidMove,
         clearBoard,
         getBoard,
     };
@@ -61,6 +37,7 @@ const gameController = (function() {
     let winnerDeclared = false;
     let draws = 0;
     let drawsDeclared = false;
+    let playSolo = false;
 
     const players = [
         {
@@ -79,12 +56,12 @@ const gameController = (function() {
         return players[num]
     };
 
-    function setPlayerOneName(num, name = "Player 1") {
-        players[num].name = name;
+    function setPlayerOneName(name = "Player 1") {
+        players[0].name = name;
     }
 
-    function setPlayerTwoName(num, name = "Player 2") {
-        players[num].name = name;
+    function setPlayerTwoName(name = "Player 2") {
+        players[1].name = name;
     }
 
     let activePlayer = players[0];
@@ -97,6 +74,40 @@ const gameController = (function() {
     
     const resetActivePlayer = () => {
         activePlayer = players[0];
+    }
+
+    const getDraws = () => draws;
+    const resetDraws = () => draws = 0;
+    const getWinnerDeclared = () => winnerDeclared;
+    const resetWinnerDeclared = () => winnerDeclared = false;
+    const resetDrawsDeclared = () => drawsDeclared = false;
+    const resetWins = () => {
+        players[0].win = 0;
+        players[1].win = 0;
+    }
+
+    const getPlaySolo = () => playSolo;
+    const setPlaySolo = () => playSolo = true;
+    const resetPlaySolo = () => playSolo = false;
+
+    function addMark(pos, player) {
+        const cell = gameboard.getBoard().flat().find(c => c.cellNum === pos);
+        if (cell) {
+            cell.name = player.name;
+            cell.mark = player.mark;
+        }
+    }
+
+    function checkInvalidMove(pos) {
+        for (let row of gameboard.getBoard()) {
+            for (let cell of row) {
+                if (cell.cellNum === pos && cell.mark) {
+                    console.log('invalid move');
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     function checkWinner(pos) {
@@ -157,22 +168,12 @@ const gameController = (function() {
     
     function playRound(pos) {
         if (drawsDeclared) return;
-        if (gameboard.checkInvalidMove(pos)) return;
+        if (checkInvalidMove(pos)) return;
         
-        gameboard.addMark(pos, getActivePlayer());
+        addMark(pos, getActivePlayer());
         checkWinner(pos);
         checkDraw();
         switchActivePlayer();
-    }
-    
-    const getDraws = () => draws;
-    const resetDraws = () => draws = 0;
-    const getWinnerDeclared = () => winnerDeclared;
-    const resetWinnerDeclared = () => winnerDeclared = false;
-    const resetDrawsDeclared = () => drawsDeclared = false;
-    const resetWins = () => {
-        players[0].win = 0;
-        players[1].win = 0;
     }
 
     return {
@@ -189,6 +190,9 @@ const gameController = (function() {
         resetDrawsDeclared,
         resetDraws,
         resetWins,
+        getPlaySolo,
+        setPlaySolo,
+        resetPlaySolo,
     }
 })();
 
@@ -229,8 +233,9 @@ const gameController = (function() {
         soloMultiplayer.style.display = 'none';
         main.style.display = 'block';
         playerTwo.style.display = 'none';
-        gameController.setPlayerOneName(1, "Computer");
+        gameController.setPlayerTwoName("Computer");
         playerTwoName.textContent = gameController.getPlayer(1).name;
+        gameController.setPlaySolo();
     }
     
     function playMultiplayerButton(event) {
@@ -243,20 +248,20 @@ const gameController = (function() {
         main.style.display = 'none';
         soloMultiplayer.style.display = 'block';
         gameboard.clearBoard();
-        gameController.resetDraws();
         gameController.resetWinnerDeclared();
+        gameController.resetDraws();
         gameController.resetWins();
+        gameController.resetPlaySolo();
         
-        updateScores();
-        updateScreen();
+        refreshUI();
 
         playerTwo.style.display = 'flex';
         markSelect.style.display = 'flex';
 
-        gameController.setPlayerOneName(0);
+        gameController.setPlayerOneName();
         playerOneName.textContent = gameController.getPlayer(0).name;
 
-        gameController.setPlayerTwoName(1);
+        gameController.setPlayerTwoName();
         playerTwoName.textContent = gameController.getPlayer(1).name;
     }
 
@@ -266,14 +271,63 @@ const gameController = (function() {
 
     function saveButtonHandler() {
         settingsDialog.close();
+
+
+        if (exSelect.checked && gameController.getPlaySolo()) {
+            gameboard.clearBoard();
+            gameController.resetWinnerDeclared();
+            gameController.resetActivePlayer();
+            gameController.resetDrawsDeclared();
+            gameController.resetDraws();
+            gameController.resetWins();
+
+            gameController.setPlayerTwoName("Computer");
+            playerTwoName.textContent = gameController.getPlayer(1).name;
+            
+            if (playerOneInput.value === '') {
+                gameController.setPlayerOneName("Player 1");
+            } else {
+                gameController.setPlayerOneName(playerOneInput.value);
+            }
+
+            playerOneName.textContent = gameController.getPlayer(0).name;
+            playerOneInput.value = '';
+            
+            refreshUI();
+
+            return
+        }
+
+        if (ohSelect.checked && gameController.getPlaySolo()) {
+            gameboard.clearBoard();
+            gameController.resetWinnerDeclared();
+            gameController.resetActivePlayer();
+            gameController.resetDrawsDeclared();
+            gameController.resetDraws();
+            gameController.resetWins();
+
+            gameController.setPlayerOneName("Computer");
+            playerOneName.textContent = gameController.getPlayer(0).name;
+            
+            if (playerOneInput.value === '') {
+                gameController.setPlayerTwoName("Player 1");
+            } else {
+                gameController.setPlayerTwoName(playerOneInput.value);
+            }
+
+            playerTwoName.textContent = gameController.getPlayer(1).name;
+            playerOneInput.value = '';
+
+            makeComputerMove();
+        }
         
         if (playerOneInput.value === '') return;
-        gameController.setPlayerOneName(0, playerOneInput.value);
+        gameController.setPlayerOneName(playerOneInput.value);
         playerOneName.textContent = gameController.getPlayer(0).name;
         playerOneInput.value = '';
 
         if (playerTwoInput.value === '') return;
-        gameController.setPlayerTwoName(1, playerTwoInput.value);
+        gameController.setPlayerTwoName(playerTwoInput.value);
         playerTwoName.textContent = gameController.getPlayer(1).name;
         playerTwoInput.value = '';
     }
@@ -285,21 +339,10 @@ const gameController = (function() {
         if (gameController.getWinnerDeclared()) return;
 
         gameController.playRound(Number(button.dataset.cellNum));
-        updateScreen();
-        updateScores();
+        refreshUI();
 
         if (gameController.getActivePlayer().name === "Computer" && !gameController.getWinnerDeclared()) {
-            setTimeout(() => {
-                const emptyCells = gameboard.getBoard().flat().filter(cell => !cell.mark);
-                if (emptyCells.length === 0) return;
-
-                const randomIndex = Math.floor(Math.random() * emptyCells.length);
-                randomCell = emptyCells[randomIndex];
-
-                gameController.playRound(randomCell.cellNum);
-                updateScreen();
-                updateScores();
-            }, 300)
+            makeComputerMove();
         }
     }
     
@@ -337,6 +380,28 @@ const gameController = (function() {
         gameController.resetActivePlayer();
         gameController.resetDrawsDeclared();
         updateScreen();
+
+        if (gameController.getPlaySolo() && gameController.getActivePlayer().name === "Computer") {
+            makeComputerMove();
+        }
+    }
+
+    function refreshUI() {
+        updateScreen();
+        updateScores();
+    }
+
+    function makeComputerMove(delay = 500) {
+        setTimeout(() => {
+            const emptyCells = gameboard.getBoard().flat().filter(cell => !cell.mark);
+            if (emptyCells.length === 0) return;
+
+            const randomIndex = Math.floor(Math.random() * emptyCells.length);
+            let randomCell = emptyCells[randomIndex];
+
+            gameController.playRound(randomCell.cellNum);
+            refreshUI()
+        }, delay);
     }
 
     updateScreen();
